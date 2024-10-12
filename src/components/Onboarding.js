@@ -45,8 +45,11 @@ const Onboarding = ({ nextStep, setFormData, formData }) => {
 		if (!validateAadhar(values.aadhar)) newErrors.aadhar = "Invalid Aadhar";
 		if (!validateGSTIN(values.gstin)) newErrors.gstin = "Invalid GSTIN";
 		if (!validateUdyam(values.udyam)) newErrors.udyam = "Invalid UDYAM";
-		if (!validateDOB(values.dob))
+		if (!values.dob) {
+			newErrors.dob = "Date of birth is required.";
+		} else if (!validateDOB(values.dob)) {
 			newErrors.dob = "You must be at least 18 years old.";
+		}
 		return newErrors;
 	};
 
@@ -71,7 +74,15 @@ const Onboarding = ({ nextStep, setFormData, formData }) => {
 						placeholder="Enter your name"
 					/>
 				</Form.Item>
-				<Form.Item label="Date of Birth" name="dob">
+				<Form.Item
+					label="Date of Birth"
+					name="dob"
+					validateStatus={errors.dob ? "error" : ""}
+					help={errors.dob}
+					rules={[
+						{ required: true, message: "Please select your date of birth!" },
+					]}
+				>
 					<DatePicker
 						placeholder="Select your date of birth"
 						format="YYYY-MM-DD"
@@ -82,6 +93,7 @@ const Onboarding = ({ nextStep, setFormData, formData }) => {
 					name="pan"
 					validateStatus={errors.pan ? "error" : ""}
 					help={errors.pan}
+					rules={[{ required: true, message: "Please input your PAN!" }]}
 				>
 					<Input
 						prefix={<IdcardOutlined className="icon-style" />}
@@ -93,6 +105,9 @@ const Onboarding = ({ nextStep, setFormData, formData }) => {
 					name="aadhar"
 					validateStatus={errors.aadhar ? "error" : ""}
 					help={errors.aadhar}
+					rules={[
+						{ required: true, message: "Please input your Aadhar number!" },
+					]}
 				>
 					<Input
 						prefix={<IdcardOutlined className="icon-style" />}
@@ -104,6 +119,7 @@ const Onboarding = ({ nextStep, setFormData, formData }) => {
 					name="gstin"
 					validateStatus={errors.gstin ? "error" : ""}
 					help={errors.gstin}
+					rules={[{ required: true, message: "Please input your GSTIN!" }]}
 				>
 					<Input
 						prefix={<BankOutlined className="icon-style" />}
@@ -115,6 +131,9 @@ const Onboarding = ({ nextStep, setFormData, formData }) => {
 					name="udyam"
 					validateStatus={errors.udyam ? "error" : ""}
 					help={errors.udyam}
+					rules={[
+						{ required: true, message: "Please input your UDYAM number!" },
+					]}
 				>
 					<Input
 						prefix={<BankOutlined className="icon-style" />}

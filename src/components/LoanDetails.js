@@ -19,12 +19,13 @@ const { Title } = Typography;
 const LoanDetails = ({ nextStep, previousStep, setLoanData, loanData }) => {
 	const [showSuccess, setShowSuccess] = useState(false);
 	const [ledger, setLedger] = useState([]);
-	const [repaymentDates, setRepaymentDates] = useState([]);
+	const [repaymentDates, setRepaymentDates] = useState(
+		loanData.repaymentDates || []
+	);
 
 	// Function to send loan data to the backend and get EMI and ledger
 	const calculateLoan = async (values) => {
 		try {
-			// Ensure repaymentDates is an array and has values
 			if (repaymentDates.length === 0) {
 				message.error("Please select repayment dates.");
 				return;
@@ -35,30 +36,29 @@ const LoanDetails = ({ nextStep, previousStep, setLoanData, loanData }) => {
 				repaymentDates,
 			});
 			const { emi, ledger } = response.data;
-			// Update loan data with EMI, ledger data,
+
+			// Update loan data with EMI and ledger
 			setLoanData({ ...loanData, ...values, emi });
 			setLedger(ledger);
 			setShowSuccess(true);
 			message.success("Loan details saved successfully!");
 		} catch (error) {
-			console.error(
-				"Error calculating loan:",
-				error.response ? error.response.data : error.message
-			);
-
-			// Show a specific error message from the backend if available
-			message.error(
-				error.response && error.response.data.message
-					? error.response.data.message
-					: "Error calculating loan. Please try again."
-			);
+			message.error("Error calculating loan. Please try again.");
+			console.error("Error calculating loan:", error);
 		}
 	};
 
-	// Handle form submission and Send loan details to backend
 	const handleFinish = (values) => {
 		calculateLoan(values);
 	};
+
+	const handleFormChange = (changedValues, allValues) => {
+		setLoanData({ ...loanData, ...allValues });
+	};
+
+	// Disable past dates
+	const disablePastDates = (current) =>
+		current && current < new Date().setHours(0, 0, 0, 0);
 
 	return (
 		<Card
@@ -81,6 +81,7 @@ const LoanDetails = ({ nextStep, previousStep, setLoanData, loanData }) => {
 						layout="vertical"
 						onFinish={handleFinish}
 						initialValues={loanData}
+						onValuesChange={handleFormChange}
 					>
 						<Form.Item
 							label="Loan Amount"
@@ -117,12 +118,27 @@ const LoanDetails = ({ nextStep, previousStep, setLoanData, loanData }) => {
 								placeholder="Enter tenure in years"
 							/>
 						</Form.Item>
-						<Form.Item label="Disbursement Date" name="disbursementDate">
-							<DatePicker format="YYYY-MM-DD" />
+						<Form.Item
+							label="Disbursement Date"
+							name="disbursementDate"
+							rules={[
+								{ required: true, message: "Please select disbursement date!" },
+							]}
+						>
+							<DatePicker format="YYYY-MM-DD" disabledDate={disablePastDates} />
 						</Form.Item>
-						<Form.Item label="Repayment Dates" name="repaymentDates">
+						<Form.Item
+							label="Repayment Dates"
+							name="repaymentDates"
+							rules={[
+								{ required: true, message: "Please select repayment dates!" },
+							]}
+						>
 							<DatePicker.RangePicker
+								format="YYYY-MM-DD"
+								disabledDate={disablePastDates}
 								onChange={(_, dateStrings) => setRepaymentDates(dateStrings)}
+								defaultValue={repaymentDates.map((date) => new Date(date))}
 							/>
 						</Form.Item>
 						<Row gutter={16}>

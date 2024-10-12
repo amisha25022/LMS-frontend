@@ -23,7 +23,10 @@ const App = () => {
 		case 2:
 			return (
 				<LoanDetails
-					nextStep={nextStep}
+					nextStep={() => {
+						setFormData((prevData) => ({ ...prevData, ...loanData }));
+						nextStep();
+					}}
 					previousStep={previousStep}
 					setLoanData={setLoanData}
 					loanData={loanData}
