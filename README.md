@@ -17,7 +17,7 @@ React Router for navigation between steps.
 Setup Instructions
 
 1. Clone the repository
-git clone https://github.com/your-username/lms-frontend.git
+git clone https://github.com/amisha25022/lms-frontend.git
 cd lms-frontend
 
 2. Install dependencies
